@@ -4,7 +4,14 @@
  */
 package view;
 
+import java.awt.event.KeyEvent;
+import java.sql.*;
+import java.sql.PreparedStatement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
+import model.Conexao;
 
 /**
  *
@@ -17,6 +24,9 @@ public class Login_Form extends javax.swing.JFrame {
      */
     public Login_Form() {
         initComponents();
+        lblU.setVisible(false);
+        lblp.setVisible(false);
+
     }
 
     /**
@@ -28,6 +38,7 @@ public class Login_Form extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         painelLogo = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -44,13 +55,26 @@ public class Login_Form extends javax.swing.JFrame {
         btnSair = new javax.swing.JButton();
         lblNotifica = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        btnRecoverSenha = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
+        labelVerSenha = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
+        lblp = new javax.swing.JLabel();
+        lblU = new javax.swing.JLabel();
+        jSeparator3 = new javax.swing.JSeparator();
+        iconSenha = new javax.swing.JLabel();
+        iconUser = new javax.swing.JLabel();
         btnFormulario = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Login");
@@ -107,9 +131,11 @@ public class Login_Form extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/avatar-de-perfil (1).png"))); // NOI18N
         painelComponentes.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 80, 60, 70));
 
+        lblUsuario.setForeground(new java.awt.Color(204, 204, 204));
         lblUsuario.setText("Usuario");
         painelComponentes.add(lblUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, -1, -1));
 
+        lblSenha.setForeground(new java.awt.Color(204, 204, 204));
         lblSenha.setText("Senha");
         painelComponentes.add(lblSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 240, 40, -1));
 
@@ -119,7 +145,12 @@ public class Login_Form extends javax.swing.JFrame {
                 txtUsuarioMouseClicked(evt);
             }
         });
-        painelComponentes.add(txtUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 160, 220, 30));
+        txtUsuario.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtUsuarioKeyPressed(evt);
+            }
+        });
+        painelComponentes.add(txtUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 160, 170, 30));
 
         txtSenha.setBorder(null);
         txtSenha.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -132,12 +163,27 @@ public class Login_Form extends javax.swing.JFrame {
                 txtSenhaActionPerformed(evt);
             }
         });
-        painelComponentes.add(txtSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 230, 220, 30));
+        txtSenha.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSenhaKeyPressed(evt);
+            }
+        });
+        painelComponentes.add(txtSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 230, 170, 30));
 
         btnLogin.setBackground(new java.awt.Color(0, 51, 153));
         btnLogin.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 12)); // NOI18N
         btnLogin.setForeground(new java.awt.Color(255, 255, 255));
         btnLogin.setText("Entrar");
+        btnLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoginActionPerformed(evt);
+            }
+        });
+        btnLogin.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnLoginKeyPressed(evt);
+            }
+        });
         painelComponentes.add(btnLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 290, -1, -1));
 
         btnSair.setBackground(new java.awt.Color(255, 255, 255));
@@ -158,30 +204,52 @@ public class Login_Form extends javax.swing.JFrame {
         painelComponentes.add(lblNotifica, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 210, 220, 10));
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
-        jLabel7.setText("Esqueceu a senha?/");
-        painelComponentes.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 340, 110, -1));
+        jLabel7.setForeground(new java.awt.Color(51, 102, 255));
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel7.setText("Esqueceu a senha?/Cick aqui");
+        jLabel7.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel7MouseClicked(evt);
+            }
+        });
+        painelComponentes.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 350, 210, -1));
 
-        btnRecoverSenha.setBackground(new java.awt.Color(255, 255, 255));
-        btnRecoverSenha.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
-        btnRecoverSenha.setText("Click aqui");
-        btnRecoverSenha.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
-        painelComponentes.add(btnRecoverSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 340, -1, -1));
-        painelComponentes.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 230, 30, 30));
-
-        jLabel5.setBackground(new java.awt.Color(153, 153, 153));
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/olhos-abertos.png"))); // NOI18N
-        painelComponentes.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(227, 240, 20, -1));
+        labelVerSenha.setBackground(new java.awt.Color(153, 153, 153));
+        labelVerSenha.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        labelVerSenha.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/olhos-abertos.png"))); // NOI18N
+        labelVerSenha.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                labelVerSenhaMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                labelVerSenhaMouseEntered(evt);
+            }
+        });
+        painelComponentes.add(labelVerSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 240, 20, -1));
 
         jSeparator1.setBackground(new java.awt.Color(0, 0, 0));
         jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
         jSeparator1.setFont(new java.awt.Font("Segoe UI Black", 1, 12)); // NOI18N
-        painelComponentes.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, 220, 10));
+        painelComponentes.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, 200, 10));
 
-        jSeparator2.setBackground(new java.awt.Color(0, 0, 0));
-        jSeparator2.setForeground(new java.awt.Color(0, 0, 0));
-        jSeparator2.setFont(new java.awt.Font("Segoe UI Black", 1, 12)); // NOI18N
-        painelComponentes.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 192, 220, 10));
+        lblp.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblp.setForeground(new java.awt.Color(204, 0, 0));
+        lblp.setText("*");
+        painelComponentes.add(lblp, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 240, -1, 10));
+
+        lblU.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblU.setForeground(new java.awt.Color(204, 0, 0));
+        lblU.setText("*");
+        painelComponentes.add(lblU, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 160, 20, 20));
+
+        jSeparator3.setBackground(new java.awt.Color(0, 0, 0));
+        jSeparator3.setForeground(new java.awt.Color(0, 0, 0));
+        jSeparator3.setFont(new java.awt.Font("Segoe UI Black", 1, 12)); // NOI18N
+        painelComponentes.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 192, 200, 10));
+        painelComponentes.add(iconSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(17, 240, 30, 30));
+
+        iconUser.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/ic_contacts_white_24dp.png"))); // NOI18N
+        painelComponentes.add(iconUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(17, 170, 30, 30));
 
         painelLogo.add(painelComponentes, new org.netbeans.lib.awtextra.AbsoluteConstraints(263, 0, 300, 430));
 
@@ -228,21 +296,21 @@ public class Login_Form extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnFormularioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFormularioActionPerformed
-        
+
         Formulario_Cadastro f = new Formulario_Cadastro();
         f.show();
         dispose();
     }//GEN-LAST:event_btnFormularioActionPerformed
 
     private void btnSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSairActionPerformed
-      int response = JOptionPane.showConfirmDialog(this,"Deseja sair e encerrar o sistema?","Sim",JOptionPane.YES_NO_OPTION ,JOptionPane.QUESTION_MESSAGE);
-      
-      if(response==JOptionPane.YES_OPTION){
-          System.out.println("Sitema encerrado!");
-          System.exit(0);
-      }else{
-          
-      }
+        int response = JOptionPane.showConfirmDialog(this, "Deseja sair e encerrar o sistema?", "Sim", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+        if (response == JOptionPane.YES_OPTION) {
+            System.out.println("Sitema encerrado!");
+            System.exit(0);
+        } else {
+
+        }
 
 
     }//GEN-LAST:event_btnSairActionPerformed
@@ -261,6 +329,101 @@ public class Login_Form extends javax.swing.JFrame {
     private void txtSenhaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSenhaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtSenhaActionPerformed
+
+    private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
+        //Recuperar senha
+        Forget esqueceu = new Forget();
+        esqueceu.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jLabel7MouseClicked
+
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        lblU.setVisible(false);
+        lblp.setVisible(false);
+
+        if (txtUsuario.getText().equals("")) {
+            lblU.setVisible(true);
+        }
+        if (String.valueOf(txtSenha.getPassword()).equals("")) {
+            lblp.setVisible(true);
+        } else {
+
+             new Teste().execute();
+            
+        }
+
+
+    }//GEN-LAST:event_btnLoginActionPerformed
+
+    private void txtUsuarioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsuarioKeyPressed
+        
+    }//GEN-LAST:event_txtUsuarioKeyPressed
+
+    private void txtSenhaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSenhaKeyPressed
+        if(evt.getKeyCode()==KeyEvent.VK_ENTER){
+            btnLogin.requestFocus();
+        }
+
+    }//GEN-LAST:event_txtSenhaKeyPressed
+
+    private void btnLoginKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnLoginKeyPressed
+        //Login atraves do enter
+        if(evt.getKeyCode()==KeyEvent.VK_ENTER){
+            lblU.setVisible(false);
+        lblp.setVisible(false);
+
+        if (txtUsuario.getText().equals("")) {
+            lblU.setVisible(true);
+        }
+        if (String.valueOf(txtSenha.getPassword()).equals("")) {
+            lblp.setVisible(true);
+        } else {
+
+            Connection con = (Connection) Conexao.conectaBD();
+            PreparedStatement ps;
+
+            try {
+                ps = con.prepareStatement("select * from usuarios where nome_usuario = ? and senha_usuario =?");
+                ps.setString(1, txtUsuario.getText());
+                ps.setString(2, String.valueOf(txtSenha.getPassword()));
+                
+                ResultSet rs = ps.executeQuery();
+                
+                if(rs.next()){
+                    //Tem que se abrir a tela de menu neste campo
+                    Cadastro_Funcionarios cad = new Cadastro_Funcionarios();
+                        cad.setVisible(true);
+                        cad.pack();
+                        this.dispose();
+//                    if(txtUsuario.getText().equals("User")){
+//                        Cadastro_Funcionarios cad = new Cadastro_Funcionarios();
+//                        cad.setVisible(true);
+//                        cad.pack();
+//                        this.dispose();
+//                    }
+                    System.out.println("yes");
+                    
+                }else{
+                    JOptionPane.showMessageDialog(null,"Nome do usuario/ senha incorecta","Atencao",2);
+                }
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(Login_Form.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+            
+        }
+
+    }//GEN-LAST:event_btnLoginKeyPressed
+
+    private void labelVerSenhaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_labelVerSenhaMouseClicked
+        // visualizar senha
+    }//GEN-LAST:event_labelVerSenhaMouseClicked
+
+    private void labelVerSenhaMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_labelVerSenhaMouseEntered
+        
+        labelVerSenha.setVisible(true);
+    }//GEN-LAST:event_labelVerSenhaMouseEntered
 
     /**
      * @param args the command line arguments
@@ -296,42 +459,102 @@ public class Login_Form extends javax.swing.JFrame {
             }
         });
     }
-    
-    public void Ocultar(boolean isUsername){
-        if(isUsername){
+
+    public void Ocultar(boolean isUsername) {
+        if (isUsername) {
             lblUsuario.setVisible(false);
-            if(txtSenha.getText().length()==0){
+            if (txtSenha.getText().length() == 0) {
                 lblSenha.setVisible(true);
             }
-        }else{
+        } else {
             lblSenha.setVisible(false);
-            if(txtUsuario.getText().length()==0){
+            if (txtUsuario.getText().length() == 0) {
                 lblUsuario.setVisible(true);
             }
         }
-            
+
     }
+    
+    public class Teste extends SwingWorker<String, Integer>{
+
+        @Override
+        protected String doInBackground() throws Exception {
+            
+            String result;
+            
+            Connection con = (Connection) Conexao.conectaBD();
+            PreparedStatement ps;
+
+            try {
+                ps = con.prepareStatement("select * from usuarios where nome_usuario = ? and senha_usuario =?");
+                ps.setString(1, txtUsuario.getText());
+                ps.setString(2, String.valueOf(txtSenha.getPassword()));
+                
+                ResultSet rs = ps.executeQuery();
+                
+                if(rs.next()){
+                    //Tem que se abrir a tela de menu neste campo
+                    Cadastro_Funcionarios cad = new Cadastro_Funcionarios();
+                        cad.setVisible(true);
+                        cad.pack();
+                        dispose();
+
+                        
+//                        System.out.println("yes");
+                    
+                }else{
+                   return "senha ou nome do usuario invalido(a)";
+                }
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(Login_Form.class.getName()).log(Level.SEVERE, null, ex);
+                
+                return ex.toString();
+            }
+            return "";
+
+        }
+        
+        @Override
+        protected void done(){
+            
+            
+        }
+    }
+    
+//    public boolean isPassWord(){
+//        
+//        if(txtSenha.isP)
+//        
+//        
+//    } 
+    
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnFormulario;
     private javax.swing.JButton btnLogin;
-    private javax.swing.JButton btnRecoverSenha;
     private javax.swing.JButton btnSair;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel iconSenha;
+    private javax.swing.JLabel iconUser;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JLabel labelVerSenha;
     private javax.swing.JLabel lblNotifica;
     private javax.swing.JLabel lblSenha;
+    private javax.swing.JLabel lblU;
     private javax.swing.JLabel lblUsuario;
+    private javax.swing.JLabel lblp;
     private javax.swing.JPanel painelComponentes;
     private javax.swing.JPanel painelLogo;
     private javax.swing.JPasswordField txtSenha;

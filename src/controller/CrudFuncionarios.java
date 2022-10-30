@@ -23,25 +23,25 @@ public class CrudFuncionarios {
     public void save(Funcionario f) {
         conex = Conexao.conectaBD();
         try {
-            ps = conex.prepareStatement("INSERT into funcionarios (nome,apelido,sexo,categoria,morada,contacto) values(?,?,?,?.?)");
+            ps = conex.prepareStatement("Insert into funcionarios (Nome,Apelido,Sexo,Categoria,Morada,Contacto) values(?,?,?,?,?,?)");
             ps.setString(1, f.getNome());
-            ps.setString(2, f.getSexo());
-            ps.setString(3, f.getCategoria());
+            ps.setString(2, f.getApelido());
+            ps.setString(3, f.getSexo());
+            ps.setString(4, f.getCategoria());
             ps.setString(5, f.getMorada());
-            ps.setString(5, f.getContacto());
-//            ps.setString(5,f.getMorada());
-            ps.execute();
+            ps.setString(6, f.getContacto());
+            ps.executeUpdate();
             ps.close();
             JOptionPane.showMessageDialog(null, "Funcionario cadastrado com sucesso");
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(CrudFuncionarios.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showInternalMessageDialog(null, "Erro ao cadastrar o funcionario" + ex.toString());
         }
     }
 
     public void update(Funcionario f) {
         conex = Conexao.conectaBD();
         try {
-            ps = conex.prepareStatement("UPDATE funcionarios set nome=?,apelido=?,sexo=?,categoria=?,morada=?,contacto=? where id=?");
+            ps = conex.prepareStatement("Update funcionarios set nome=?,apelido=?,sexo=?,categoria=?,morada=?,contacto=? where id=?");
             ps.setInt(1, f.getId());
             ps.setString(2, f.getNome());
             ps.setString(3, f.getApelido());
@@ -70,7 +70,7 @@ public class CrudFuncionarios {
     public void delete(Funcionario f) {
         conex = Conexao.conectaBD();
         try {
-            ps = conex.prepareStatement("DELETE FORM funcionario where id=?");
+            ps = conex.prepareStatement("delete from funcionarios where id=?");
             ps.setInt(1, f.getId());
             ps.execute();
 
@@ -106,9 +106,10 @@ public class CrudFuncionarios {
         return lista;
     }
 
-    public List<Funcionario> read() {
+    public ArrayList<Funcionario> read() {
         conex = Conexao.conectaBD();
-        List<Funcionario> func = new ArrayList<>();
+        ArrayList<Funcionario> func = null;
+        
         try {
             ps = conex.prepareStatement("select * from funcionarios");
             rs = ps.executeQuery();//Faz consultas no banco
@@ -117,18 +118,18 @@ public class CrudFuncionarios {
 
                 Funcionario fuc = new Funcionario();
 
-                fuc.setId(rs.getInt("id"));
-                fuc.setNome(rs.getString("nome"));
-                fuc.setApelido(rs.getString("apelido"));
-                fuc.setSexo(rs.getString("sexo"));
-                fuc.setCategoria(rs.getString("categoria"));
-                fuc.setMorada(rs.getString("morada"));
-                fuc.setContacto(rs.getString("contacto"));
+                fuc.setId(rs.getInt(1));
+                fuc.setNome(rs.getString(2));
+                fuc.setApelido(rs.getString(3));
+                fuc.setSexo(rs.getString(4));
+                fuc.setCategoria(rs.getString(5));
+                fuc.setMorada(rs.getString(6));
+                fuc.setContacto(rs.getString(7));
+//                func.add(fuc);
 
             }
             ps.close();
             conex.close();
-            rs.close();
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);

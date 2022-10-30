@@ -6,6 +6,7 @@ public class Usuario {
 
     private int id_usuario;
     private String nome_usuario,senha_usuario,confirmarSenha;
+    private String nome_apelido,email,questao_seguranca,resposta;
 
     public String getConfirmarSenha() {
         return confirmarSenha;
@@ -15,7 +16,6 @@ public class Usuario {
         this.confirmarSenha = confirmarSenha;
     }
     private String contacto;
-    private String email;
     /**
      * @return the id_usuario
      */
@@ -84,6 +84,30 @@ public class Usuario {
      */
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getNome_apelido() {
+        return nome_apelido;
+    }
+
+    public void setNome_apelido(String nome_apelido) {
+        this.nome_apelido = nome_apelido;
+    }
+
+    public String getQuestao_seguranca() {
+        return questao_seguranca;
+    }
+
+    public void setQuestao_seguranca(String questao_seguranca) {
+        this.questao_seguranca = questao_seguranca;
+    }
+
+    public String getResposta() {
+        return resposta;
+    }
+
+    public void setResposta(String resposta) {
+        this.resposta = resposta;
     }
     
     

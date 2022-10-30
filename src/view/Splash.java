@@ -6,6 +6,7 @@ public class Splash {
     public static void main(String[] args) {
        
         SplashHome splash = new SplashHome();
+        
         splash.setVisible(true);
         Login_Form login = new Login_Form();
         

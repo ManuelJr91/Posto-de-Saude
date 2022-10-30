@@ -11,13 +11,13 @@ public class Verificacao {
     public Verificacao(String Username,String Password){
         
     }
-    public Boolean Check(){
-        try{
-        rs = conn.creatStatement().executeQuery(sql);
-        }
-        catch(SQLException ex){
-            JOptionPane.showMessageDialog(null,"Erro"+ex);
-        }
-        return null;
-    }
+//    public Boolean Check(){
+//        try{
+//        rs = conn.creatStatement().executeQuery(sql);
+//        }
+//        catch(SQLException ex){
+//            JOptionPane.showMessageDialog(null,"Erro"+ex);
+//        }
+//        return null;
+//    }
 }
